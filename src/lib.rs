@@ -18,12 +18,12 @@ pub struct ClockSettings {
 #[derive(Debug, Copy, Clone)]
 pub enum Piece {
     None,
-    Pawn(color: Color),
-    Knight(color: Color),
-    Bishop(color: Color),
-    Rook(color: Color),
-    Queen(color: Color),
-    King(color: Color),
+    Pawn(Color),
+    Knight(Color),
+    Bishop(Color),
+    Rook(Color),
+    Queen(Color),
+    King(Color),
 }
 
 pub struct Board {
