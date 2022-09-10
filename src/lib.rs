@@ -144,6 +144,7 @@ impl Board {
                     },
 
                     'r' => {
+                        println!("rook: {row}, {col}");
                         board[row][col] = Piece::Rook(Color::Black);
                         col += 1;
                     },
