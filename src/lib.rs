@@ -32,7 +32,7 @@ pub struct ClockSettings {
     pub days: i32,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Piece {
     None,
     Pawn(Color),
@@ -300,10 +300,25 @@ impl Board {
         }
     }
 
-    pub fn make_move(src: Square, dst: Square) -> Result<(), &'static str> {
+    pub fn get(&self, square: Square) -> Piece {
+        self.state[square[0]][square[1]]
+    }
+
+    pub fn set(&mut self, square: Square, piece: Piece) {
+        self.state[square[0]][square[1]] = piece;
+    }
+
+    pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), &'static str> {
         if src == dst {
-            return Err("Source is the same as destination");
+            return Err("Cannot move a piece into itself");
         }
+
+        if self.get(src) == Piece::None {
+            return Err("Cannot move an empty square");
+        }
+
+        self.set(dst, self.get(src));
+        self.set(src, Piece::None);
 
         Ok(())
     }
