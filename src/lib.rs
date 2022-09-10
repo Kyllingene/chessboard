@@ -295,7 +295,7 @@ impl Board {
             halfmoves: halfmoves.parse().unwrap(),
             fullmoves: fullmoves.parse().unwrap(),
             castling: castling,
-            en_passant: Board::square_to_indices(en_passant),
+            en_passant: Board::coords_to_indices(en_passant),
             state: board,
         }
     }
