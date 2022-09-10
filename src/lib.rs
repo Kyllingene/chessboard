@@ -321,10 +321,10 @@ impl Board {
 impl std::fmt::Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut board = String::new();
+        println!("a");
 
         let mut rind = 1;
         for row in &self.state {
-            println!("row: {}", rind);
             board.push_str(format!("{} | ", rind).as_str());
             for col in row {
                 board.push_str(format!("{} ", col).as_str());
