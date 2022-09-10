@@ -1,5 +1,7 @@
 #[warn(clippy::all)]
 
+pub type Square = [usize; 2];
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum CanCastle {
     None,
@@ -296,6 +298,10 @@ impl Board {
             en_passant: Board::square_to_indices(en_passant),
             state: board,
         }
+    }
+
+    pub fn move(src: Square, dst: Square) {
+        
     }
 
     fn square_to_indices(m: String) -> Option<[usize; 2]> {
