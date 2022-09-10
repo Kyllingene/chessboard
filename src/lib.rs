@@ -328,9 +328,6 @@ impl Board {
             return Err("Cannot move a piece into itself");
         }
 
-        if self.get(src) == Piece::None {
-        }
-
         let src_color = match self.get(src) {
             Piece::None => return Err("Cannot move an empty square"),
             Piece::Pawn(c) => c,
@@ -342,7 +339,13 @@ impl Board {
         };
 
         let dst_color = match self.get(dst) {
-            Piece::None => return Err("Cannot move an empty square"),
+            Piece::None => {
+                match src_color {
+                    Color::Random => Color::White,
+                    Color::White => Color::Black,
+                    Color::Black => Color::White,
+                }
+            },
             Piece::Pawn(c) => c,
             Piece::Knight(c) => c,
             Piece::Rook(c) => c,
