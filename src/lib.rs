@@ -323,23 +323,35 @@ impl Board {
         Ok(())
     }
 
-    fn coords_to_indices(m: String) -> Option<Square> {
+    pub fn uci(uci: String) -> Result<Square, &'static str> {
+        if uci.len() != 4 {
+            return Err("Move is not the right length (UCI format uses 4 characters)");
+        }
+
+        // TODO: there has to be a better way
+        let src = Board::coords_to_indices(format!("{}{}", uci.chars().collect::<Vec<char>>()[0], uci.chars().collect::<Vec<char>>()[1]))?;
+        let dst = Board::coords_to_indices(format!("{}{}", uci.chars().collect::<Vec<char>>()[2], uci.chars().collect::<Vec<char>>()[3]))?;
+
+        todo!()
+    }
+
+    pub fn coords_to_indices(m: String) -> Result<Square, &'static str> {
         if m.len() != 2 {
-            return None;
+            return Err("Coordinates must be 2 characters");
         }
 
         let first = m.chars().collect::<Vec<char>>()[0];
         let second = m.chars().collect::<Vec<char>>()[1];
 
         if !"abcdefgh".contains(first) {
-            return None;
+            return Err("First character must be in the range `a-z`");
         }
 
         if !"12345678".contains(second) {
-            return None;
+            return Err("Second character must be in the range `1-8`");
         }
 
-        Some([String::from(second).parse().unwrap(), (first as usize) - 96])
+        Ok([String::from(second).parse().unwrap(), (first as usize) - 96])
     }
 }
 
