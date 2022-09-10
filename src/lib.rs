@@ -102,7 +102,7 @@ pub struct Board {
 
     pub castling: Castling,
 
-    pub en_passant: Option<[usize; 2]>,
+    pub en_passant: Option<Square>,
 
     state: Vec<Vec<Piece>>,
 }
@@ -300,11 +300,13 @@ impl Board {
         }
     }
 
-    pub fn move(src: Square, dst: Square) {
-        
+    pub fn make_move(src: Square, dst: Square) -> Result<(), &str> {
+        if src == dst {
+            Err("Source is the same as destination")
+        }
     }
 
-    fn square_to_indices(m: String) -> Option<[usize; 2]> {
+    fn coords_to_indices(m: String) -> Option<Square> {
         if m.len() != 2 {
             return None;
         }
