@@ -139,7 +139,7 @@ impl Board {
             if spaces == 0 {
                 match char {
                     '/' => {
-                        col = 1;
+                        col = 0;
                         row += 1;
                     },
 
