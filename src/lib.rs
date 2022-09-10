@@ -300,7 +300,7 @@ impl Board {
         }
     }
 
-    pub fn make_move(src: Square, dst: Square) -> Result<(), &str> {
+    pub fn make_move(src: Square, dst: Square) -> Result<(), &'static str> {
         if src == dst {
             Err("Source is the same as destination")
         }
