@@ -332,9 +332,7 @@ impl std::fmt::Display for Board {
             board.push('\n');
         }
 
-        for cind in 1..=8 as u8 {
-            board.push_str(format!("{}", (cind + 96) as char).as_str());
-        }
+        board.push_str("  +----------------\n    a b c d e f g h");
 
         write!(f, "{}", board)
     }
