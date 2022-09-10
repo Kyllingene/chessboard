@@ -329,7 +329,32 @@ impl Board {
         }
 
         if self.get(src) == Piece::None {
-            return Err("Cannot move an empty square");
+        }
+
+        let src_color = match self.get(src) {
+            Piece::None => return Err("Cannot move an empty square"),
+            Piece::Pawn(c) => c,
+            Piece::Knight(c) => c,
+            Piece::Rook(c) => c,
+            Piece::Bishop(c) => c,
+            Piece::Queen(c) => c,
+            Piece::King(c) => c,
+        };
+
+        let dst_color = match self.get(src) {
+            Piece::None => return Err("Cannot move an empty square"),
+            Piece::Pawn(c) => c,
+            Piece::Knight(c) => c,
+            Piece::Rook(c) => c,
+            Piece::Bishop(c) => c,
+            Piece::Queen(c) => c,
+            Piece::King(c) => c,
+        };
+
+        if src_color != self.turn {
+            return Err("It isn't your turn");
+        } else if src_color == dst_color {
+            return Err("Can't move into your own piece");
         }
 
         self.set(dst, self.get(src));
