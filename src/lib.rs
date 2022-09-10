@@ -108,6 +108,12 @@ pub struct Board {
 }
 
 impl Board {
+    // TODO: many things
+    // first: make the fen parsing better
+    // second: add error handling
+    // third: refactor everything to be better
+
+    /// Creates a board with an optional fen string
     pub fn new(fen: Option<String>, side: Color) -> Board {
         let initial = match fen {
             None => String::from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
@@ -306,14 +312,17 @@ impl Board {
         }
     }
 
+    /// Gets a piece from the board
     pub fn get(&self, square: Square) -> Piece {
         self.state[square[0]][square[1]]
     }
 
+    /// Sets a piece on the board
     pub fn set(&mut self, square: Square, piece: Piece) {
         self.state[square[0]][square[1]] = piece;
     }
 
+    /// Makes a move; if the move is invalid, an error will be returned detailing the problem
     pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), &'static str> {
         if src == dst {
             return Err("Cannot move a piece into itself");
@@ -329,7 +338,7 @@ impl Board {
         Ok(())
     }
 
-    pub fn uci(uci: String) -> Result<Square, &'static str> {
+    pub fn uci(&mut self, uci: String) -> Result<(), &'static str> {
         if uci.len() != 4 {
             return Err("Move is not the right length (UCI format uses 4 characters)");
         }
@@ -338,9 +347,10 @@ impl Board {
         let src = Board::coords_to_indices(format!("{}{}", uci.chars().collect::<Vec<char>>()[0], uci.chars().collect::<Vec<char>>()[1]))?;
         let dst = Board::coords_to_indices(format!("{}{}", uci.chars().collect::<Vec<char>>()[2], uci.chars().collect::<Vec<char>>()[3]))?;
 
-        todo!()
+        self.make_move(src, dst)
     }
 
+    /// Converts algebraic coordinates to board indices; if the coords are invalid, and error will be returned detailing the problem
     pub fn coords_to_indices(m: String) -> Result<Square, &'static str> {
         if m.len() != 2 {
             return Err("Coordinates must be 2 characters");
