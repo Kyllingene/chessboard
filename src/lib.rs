@@ -304,6 +304,8 @@ impl Board {
         if src == dst {
             Err("Source is the same as destination")
         }
+
+        Ok(())
     }
 
     fn coords_to_indices(m: String) -> Option<Square> {
