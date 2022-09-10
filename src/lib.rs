@@ -323,13 +323,13 @@ impl std::fmt::Display for Board {
         let mut board = String::new();
         println!("a");
 
-        let mut rind = 1;
+        let mut rind = 8;
         for row in &self.state {
             board.push_str(format!("{} | ", rind).as_str());
             for col in row {
                 board.push_str(format!("{} ", col).as_str());
             }
-            rind += 1;
+            rind += -1;
             board.push('\n');
         }
 
