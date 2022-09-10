@@ -289,13 +289,19 @@ impl Board {
             }
         }
 
+        let e = if en_passant != "" {
+            Some(Board::coords_to_indices(en_passant).unwrap())
+        } else {
+            None
+        };
+
         Board {
             side: side,
             turn: turn,
             halfmoves: halfmoves.parse().unwrap(),
             fullmoves: fullmoves.parse().unwrap(),
             castling: castling,
-            en_passant: Board::coords_to_indices(en_passant),
+            en_passant: e,
             state: board,
         }
     }
