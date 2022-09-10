@@ -341,7 +341,7 @@ impl Board {
             Piece::King(c) => c,
         };
 
-        let dst_color = match self.get(src) {
+        let dst_color = match self.get(dst) {
             Piece::None => return Err("Cannot move an empty square"),
             Piece::Pawn(c) => c,
             Piece::Knight(c) => c,
