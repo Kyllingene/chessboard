@@ -357,6 +357,8 @@ impl Board {
             return Err("Can't move into your own piece");
         }
 
+        // TODO: implement castling/check
+
         self.set(dst, self.get(src));
         self.set(src, Piece::None);
 
