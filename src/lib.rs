@@ -329,7 +329,7 @@ impl std::fmt::Display for Board {
             for col in row {
                 board.push_str(format!("{} ", col).as_str());
             }
-            rind += -1;
+            rind -= 1;
             board.push('\n');
         }
 
