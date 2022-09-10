@@ -184,7 +184,7 @@ impl Board {
                         col += 1;
                     },
                     'p' => {
-                        board[row][col] = Piece::Pawn(Color::Black);
+                        board[row-1][col] = Piece::Pawn(Color::Black);
                         col += 1;
                     },
                     'P' => {
