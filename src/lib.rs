@@ -34,7 +34,9 @@ impl std::fmt::Display for Color {
 }
 
 impl std::ops::Not for Color {
-    fn not(&self) -> Color {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
         match self {
             Color::White => Color::Black,
             Color::Black => Color::White,
