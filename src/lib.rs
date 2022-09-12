@@ -375,8 +375,8 @@ impl Board {
         }
 
         // TODO: there has to be a better way
-        let src = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[0], uci.chars().collect::<Vec<char>>()[1]))?;
-        let dst = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[2], uci.chars().collect::<Vec<char>>()[3]))?;
+        let src = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[0], m.chars().collect::<Vec<char>>()[1]))?;
+        let dst = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[2], m.chars().collect::<Vec<char>>()[3]))?;
 
         self.make_move(src, dst)
     }
