@@ -324,12 +324,12 @@ impl Board {
 
     /// Gets a piece from the board
     pub fn get(&self, square: Square) -> Piece {
-        self.state[square[0]][square[1]]
+        self.state[square[1]][square[0]]
     }
 
     /// Sets a piece on the board
     pub fn set(&mut self, square: Square, piece: Piece) {
-        self.state[square[0]][square[1]] = piece;
+        self.state[square[1]][square[0]] = piece;
     }
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
