@@ -324,6 +324,7 @@ impl Board {
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
     pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), &'static str> {
+        println!("{:?}, {:?}", src, dst);
         if src == dst {
             return Err("Cannot move a piece into itself");
         }
@@ -370,7 +371,6 @@ impl Board {
     }
 
     pub fn uci(&mut self, m: String) -> Result<(), &'static str> {
-        println!("len of move: {}", m.len());
         if m.len() != 4 {
             return Err("Move is not the right length (UCI format uses 4 characters)");
         }
@@ -379,6 +379,7 @@ impl Board {
         let src = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[0], m.chars().collect::<Vec<char>>()[1]))?;
         let dst = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[2], m.chars().collect::<Vec<char>>()[3]))?;
 
+        println!("{}", m);
         self.make_move(src, dst)
     }
 
