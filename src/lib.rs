@@ -334,8 +334,8 @@ impl Board {
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
     pub fn make_move(&mut self, s: Square, d: Square) -> Result<(), String> {
-        let src = [8 - s[0], 8-s[1]];
-        let dst = [8 - d[0], 8-d[1]];
+        let src = [7 - s[0], 7-s[1]];
+        let dst = [7 - d[0], 7-d[1]];
 
         if src == dst {
             return Err("Cannot move a piece into itself".to_string());
@@ -413,7 +413,7 @@ impl Board {
             return Err(format!("Second character must be in the range `1-8`, was {}", second));
         }
 
-        Ok([String::from(second).parse::<usize>().unwrap() - 1, (first as usize) - 97])
+        Ok([String::from(second).parse::<usize>().unwrap(), (first as usize) - 96])
     }
 
     /// Returns whose turn it is
