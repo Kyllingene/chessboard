@@ -333,7 +333,10 @@ impl Board {
     }
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
-    pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), String> {
+    pub fn make_move(&mut self, s: Square, d: Square) -> Result<(), String> {
+        let src = [8 - s[0], 8-s[1]];
+        let dst = [8 - d[0], 8-d[1]];
+
         if src == dst {
             return Err("Cannot move a piece into itself".to_string());
         }
