@@ -389,11 +389,7 @@ impl Board {
         self.set(dst, self.get(src));
         self.set(src, Piece::None);
 
-        match src_color {
-            Color::White => self.turn = Color::Black,
-            Color::Black => self.turn = Color::White,
-            Color::Random => {},
-        }
+        self.turn = !self.turn;
 
         Ok(())
     }
