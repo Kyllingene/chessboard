@@ -33,6 +33,16 @@ impl std::fmt::Display for Color {
     }
 }
 
+impl std::ops::Not for Color {
+    fn not(&self) -> Color {
+        match self {
+            Color::White => Color::Black,
+            Color::Black => Color::White,
+            Color::Random => Color::Random,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct ClockSettings {
     pub limit: i32,
