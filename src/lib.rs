@@ -379,9 +379,9 @@ impl Board {
         Ok(())
     }
 
-    pub fn uci(&mut self, m: String) -> Result<(), &'static str> {
+    pub fn uci(&mut self, m: String) -> Result<(), String> {
         if m.len() != 4 {
-            return Err("Move is not the right length (UCI format uses 4 characters)");
+            return Err(format!("Move is not the right length (UCI format uses 4 characters, recieved {})", m.len()));
         }
 
         // TODO: there has to be a better way
@@ -394,20 +394,20 @@ impl Board {
     }
 
     /// Converts algebraic coordinates to board indices; if the coords are invalid, and error will be returned detailing the problem
-    pub fn coords_to_indices(m: String) -> Result<Square, &'static str> {
+    pub fn coords_to_indices(m: String) -> Result<Square, String> {
         if m.len() != 2 {
-            return Err("Coordinates must be 2 characters");
+            return Err(format!("Coordinates must be 2 characters (recieved {})", m.len()));
         }
 
         let first = m.chars().collect::<Vec<char>>()[0];
         let second = m.chars().collect::<Vec<char>>()[1];
 
         if !"abcdefgh".contains(first) {
-            return Err("First character must be in the range `a-z`");
+            return Err(format!("First character must be in the range `a-z`, was {}", first));
         }
 
         if !"12345678".contains(second) {
-            return Err("Second character must be in the range `1-8`");
+            return Err(format!("Second character must be in the range `1-8`, was {}", second));
         }
 
         Ok([String::from(second).parse::<usize>().unwrap() - 1, (first as usize) - 97])
