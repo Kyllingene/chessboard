@@ -400,7 +400,8 @@ impl Board {
             return Err("Second character must be in the range `1-8`");
         }
 
-        Ok([(second as usize) - 96, String::from(first).parse().unwrap()])
+        println!();
+        Ok([(first as usize) - 96, String::from(second).parse().unwrap()])
     }
 }
 
