@@ -381,6 +381,7 @@ impl Board {
         match src_color {
             Color::White => self.turn = Color::Black,
             Color::Black => self.turn = Color::White,
+            Color::Random => {},
         }
 
         Ok(())
