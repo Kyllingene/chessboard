@@ -366,7 +366,6 @@ impl Board {
         };
 
         if src_color != self.turn {
-            println!("{}", self.get(src));
             return Err(format!("It isn't your turn ({}'s turn, tried to move a {} piece)", self.turn, src_color));
         } else if src_color == dst_color {
             return Err("Can't move into your own piece".to_string());
@@ -396,7 +395,6 @@ impl Board {
         let src = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[0], m.chars().collect::<Vec<char>>()[1]))?;
         let dst = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[2], m.chars().collect::<Vec<char>>()[3]))?;
 
-        println!("{:?}, {:?}", src, dst);
         self.make_move(src, dst)
     }
 
