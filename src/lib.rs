@@ -324,7 +324,7 @@ impl Board {
 
     /// Gets a piece from the board
     pub fn get(&self, square: Square) -> Piece {
-        self.state[square[1]][square[0]]
+        self.state[7 - square[1]][square[0]]
     }
 
     /// Sets a piece on the board
