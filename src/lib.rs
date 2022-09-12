@@ -329,7 +329,7 @@ impl Board {
 
     /// Sets a piece on the board
     pub fn set(&mut self, square: Square, piece: Piece) {
-        self.state[7- square[1]][square[0]] = piece;
+        self.state[7 - square[1]][square[0]] = piece;
     }
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
@@ -377,6 +377,11 @@ impl Board {
 
         self.set(dst, self.get(src));
         self.set(src, Piece::None);
+
+        match src_color {
+            Color::White => self.turn = Color::Black,
+            Color::Black => self.turn = Color::White,
+        }
 
         Ok(())
     }
