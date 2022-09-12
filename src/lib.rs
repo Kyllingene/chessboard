@@ -365,7 +365,7 @@ impl Board {
         };
 
         if src_color != self.turn {
-            return Err(format!("It isn't your turn ({}'s turn, tried to move a {} piece)", self.turn, src_color));
+            return Err(format!("It isn't your turn ({}'s turn, tried to move a {} piece)", self.turn, src_color).as_str());
         } else if src_color == dst_color {
             return Err("Can't move into your own piece");
         }
