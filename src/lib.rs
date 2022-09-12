@@ -411,7 +411,7 @@ impl Board {
             return Err(format!("Second character must be in the range `1-8`, was {}", second));
         }
 
-        Ok([String::from(second).parse::<usize>().unwrap(), (first as usize) - 96])
+        Ok([7 - String::from(second).parse::<usize>().unwrap(), 103 - (first as usize)])
     }
 
     /// Returns whose turn it is
