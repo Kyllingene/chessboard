@@ -399,6 +399,7 @@ impl Board {
         if m.len() != 2 {
             return Err(format!("Coordinates must be 2 characters (recieved {})", m.len()));
         }
+        println!("{}", m);
 
         let first = m.chars().collect::<Vec<char>>()[0];
         let second = m.chars().collect::<Vec<char>>()[1];
