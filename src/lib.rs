@@ -369,14 +369,14 @@ impl Board {
         Ok(())
     }
 
-    pub fn uci(&mut self, uci: String) -> Result<(), &'static str> {
-        if uci.len() != 4 {
+    pub fn uci(&mut self, m: String) -> Result<(), &'static str> {
+        if m.len() != 4 {
             return Err("Move is not the right length (UCI format uses 4 characters)");
         }
 
         // TODO: there has to be a better way
-        let src = Board::coords_to_indices(format!("{}{}", uci.chars().collect::<Vec<char>>()[0], uci.chars().collect::<Vec<char>>()[1]))?;
-        let dst = Board::coords_to_indices(format!("{}{}", uci.chars().collect::<Vec<char>>()[2], uci.chars().collect::<Vec<char>>()[3]))?;
+        let src = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[0], uci.chars().collect::<Vec<char>>()[1]))?;
+        let dst = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[2], uci.chars().collect::<Vec<char>>()[3]))?;
 
         self.make_move(src, dst)
     }
