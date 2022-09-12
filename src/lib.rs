@@ -389,7 +389,6 @@ impl Board {
         let src = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[0], m.chars().collect::<Vec<char>>()[1]))?;
         let dst = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[2], m.chars().collect::<Vec<char>>()[3]))?;
 
-        println!("{}", m);
         println!("{:?}, {:?}", src, dst);
         self.make_move(src, dst)
     }
@@ -399,7 +398,6 @@ impl Board {
         if m.len() != 2 {
             return Err(format!("Coordinates must be 2 characters (recieved {})", m.len()));
         }
-        println!("{}", m);
 
         let first = m.chars().collect::<Vec<char>>()[0];
         let second = m.chars().collect::<Vec<char>>()[1];
