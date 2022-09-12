@@ -333,13 +333,13 @@ impl Board {
     }
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
-    pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), &'static str> {
+    pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), String> {
         if src == dst {
-            return Err("Cannot move a piece into itself");
+            return Err("Cannot move a piece into itself".to_string());
         }
 
         let src_color = match self.get(src) {
-            Piece::None => return Err("Cannot move an empty square"),
+            Piece::None => return Err("Cannot move an empty square".to_string()),
             Piece::Pawn(c) => c,
             Piece::Knight(c) => c,
             Piece::Rook(c) => c,
@@ -365,9 +365,9 @@ impl Board {
         };
 
         if src_color != self.turn {
-            return Err(format!("It isn't your turn ({}'s turn, tried to move a {} piece)", self.turn, src_color).as_str());
+            return Err(format!("It isn't your turn ({}'s turn, tried to move a {} piece)", self.turn, src_color));
         } else if src_color == dst_color {
-            return Err("Can't move into your own piece");
+            return Err("Can't move into your own piece".to_string());
         }
 
         // TODO: implement castling
