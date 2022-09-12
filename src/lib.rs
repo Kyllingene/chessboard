@@ -370,6 +370,7 @@ impl Board {
     }
 
     pub fn uci(&mut self, m: String) -> Result<(), &'static str> {
+        println!("len of move: {}", m.len());
         if m.len() != 4 {
             return Err("Move is not the right length (UCI format uses 4 characters)");
         }
