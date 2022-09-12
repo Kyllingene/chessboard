@@ -324,7 +324,6 @@ impl Board {
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
     pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), &'static str> {
-        println!("{:?}, {:?}", src, dst);
         if src == dst {
             return Err("Cannot move a piece into itself");
         }
@@ -380,6 +379,7 @@ impl Board {
         let dst = Board::coords_to_indices(format!("{}{}", m.chars().collect::<Vec<char>>()[2], m.chars().collect::<Vec<char>>()[3]))?;
 
         println!("{}", m);
+        println!("{:?}, {:?}", src, dst);
         self.make_move(src, dst)
     }
 
