@@ -344,9 +344,8 @@ impl Board {
         self.state[7 - square[1]][square[0]] = piece;
     }
 
-    /// Makes a move; if the move is invalid, an error will be returned detailing the problem
-    pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), String> {
-        println!("{}, {}", self.get(src), self.get(dst));
+    /// Validates a move; if the move is invalid, an error will be returned detailing the problem
+    pub fn check(&self, src: Square, dst: Square) -> Result<(), String> {
         if src == dst {
             return Err("Cannot move a piece into itself".to_string());
         }
@@ -385,6 +384,13 @@ impl Board {
 
         // TODO: implement castling
         // TODO: implement check
+
+        Ok(())
+    }
+
+    /// Makes a move; if the move is invalid, an error will be returned detailing the problem
+    pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), String> {
+        self.check(src, dst);
 
         self.set(dst, self.get(src));
         self.set(src, Piece::None);
