@@ -403,6 +403,7 @@ impl Board {
     pub fn make_move_same_turn(&mut self, src: Square, dst: Square) -> Result<(), String> {
         self.make_move(src, dst)?;
         self.turn = !self.turn;
+        Ok(())
     }
 
     pub fn uci(&mut self, m: String) -> Result<(), String> {
