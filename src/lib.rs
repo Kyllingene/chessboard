@@ -400,6 +400,11 @@ impl Board {
         Ok(())
     }
 
+    pub fn make_move_same_turn(&mut self, src: Square, dst: Square) -> Result<(), String> {
+        self.make_move(src, dst)?;
+        self.turn = !self.turn;
+    }
+
     pub fn uci(&mut self, m: String) -> Result<(), String> {
         if m.len() != 4 {
             return Err(format!("Move is not the right length (UCI format uses 4 characters, recieved {})", m.len()));
