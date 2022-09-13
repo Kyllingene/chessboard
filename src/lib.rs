@@ -407,6 +407,13 @@ impl Board {
         Ok(())
     }
 
+    /// Makes a move as if it were the previous turn
+    pub fn make_move_prev_turn(&mut self, src: Square, dst: Square) -> Result<(), String> {
+        self.turn = !self.turn;
+        self.make_move(src, dst)?;
+        Ok(())
+    }
+
     pub fn uci(&mut self, m: String) -> Result<(), String> {
         if m.len() != 4 {
             return Err(format!("Move is not the right length (UCI format uses 4 characters, recieved {})", m.len()));
