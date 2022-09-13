@@ -445,11 +445,6 @@ impl Board {
 
         Ok([(first as usize) - 97, String::from(second).parse::<usize>().unwrap() - 1])
     }
-
-    /// Returns whose turn it is
-    pub fn whos_turn(&self) -> Color {
-        self.turn
-    }
 }
 
 impl std::fmt::Display for Board {
