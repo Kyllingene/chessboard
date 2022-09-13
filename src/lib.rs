@@ -390,7 +390,7 @@ impl Board {
 
     /// Makes a move; if the move is invalid, an error will be returned detailing the problem
     pub fn make_move(&mut self, src: Square, dst: Square) -> Result<(), String> {
-        self.check(src, dst);
+        self.check(src, dst)?;
 
         self.set(dst, self.get(src));
         self.set(src, Piece::None);
