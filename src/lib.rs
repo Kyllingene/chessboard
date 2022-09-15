@@ -79,7 +79,7 @@ impl Color {
     }
 
     pub fn turn(&self) -> i32 {
-        self.into()
+        *self.into()
     }
 }
 
