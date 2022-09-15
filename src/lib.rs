@@ -59,9 +59,9 @@ impl std::convert::From<i32> for Color {
     }
 }
 
-impl std::convert::Into<i32> for Color {
-    fn into(self) -> i32 {
-        match self {
+impl std::convert::From<Color> for i32 {
+    fn from(c: Color) -> i32 {
+        match c {
             Color::Random => -1,
             Color::Invalid => -1,
             Color::Black => 0,
@@ -76,6 +76,10 @@ impl Color {
             Color::Invalid => panic!("Invalid color (Color::Invalid)"),
             _ => self,
         }
+    }
+
+    pub fn turn(&self) -> i32 {
+        self.into()
     }
 }
 
