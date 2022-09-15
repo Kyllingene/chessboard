@@ -70,6 +70,16 @@ impl std::convert::Into<i32> for Color {
     }
 }
 
+impl Color {
+    pub fn unwrap(self) -> Color {
+        match self {
+            Color::Random => panic!("Invalid color (Color::Random)"),
+            Color::Invalid => panic!("Invalid color (Color::Invalid)"),
+            _ => self,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct ClockSettings {
     pub limit: i32,
