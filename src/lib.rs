@@ -64,8 +64,8 @@ impl std::convert::From<Color> for i32 {
         match c {
             Color::Random => -1,
             Color::Invalid => -1,
-            Color::Black => 0,
-            Color::White => 1,
+            Color::White => 0,
+            Color::Black => 1,
         }
     }
 }
