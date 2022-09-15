@@ -21,14 +21,16 @@ pub enum Color {
     White,
     Black,
     Random,
+    Invalid,
 }
 
 impl std::fmt::Display for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Color::White  => write!(f, "White"),
-            Color::Black  => write!(f, "Black"),
-            Color::Random => write!(f, "Random"),
+            Color::White   => write!(f, "White"),
+            Color::Black   => write!(f, "Black"),
+            Color::Random  => write!(f, "Random"),
+            Color::Invalid => write!(f, "Invalid"),
         }
     }
 }
@@ -38,9 +40,32 @@ impl std::ops::Not for Color {
 
     fn not(self) -> Self::Output {
         match self {
-            Color::White => Color::Black,
-            Color::Black => Color::White,
-            Color::Random => Color::Random,
+            Color::White   => Color::Black,
+            Color::Black   => Color::White,
+            Color::Random  => Color::Random,
+            Color::Invalid => Color::Invalid,
+        }
+    }
+}
+
+impl std::convert::From<i32> for Color {
+    fn from(item: i32) -> Self {
+        match item {
+            0 => Color::Random,
+            1 => Color::Black,
+            2 => Color::White,
+            _ => Color::Invalid,
+        }
+    }
+}
+
+impl std::convert::Into<i32> for Color {
+    fn into(self) -> i32 {
+        match self {
+            Color::Random => 0, 
+            Color::Invalid => 0, 
+            Color::Black => 1, 
+            Color::White => 2, 
         }
     }
 }
@@ -363,9 +388,10 @@ impl Board {
         let dst_color = match self.get(dst) {
             Piece::None => {
                 match src_color {
-                    Color::Random => Color::White,
-                    Color::White => Color::Black,
-                    Color::Black => Color::White,
+                    Color::Random  => Color::Invalid,
+                    Color::Invalid => Color::Invalid,
+                    Color::White   => Color::Black,
+                    Color::Black   => Color::White,
                 }
             },
             Piece::Pawn(c) => c,
