@@ -62,10 +62,10 @@ impl std::convert::From<i32> for Color {
 impl std::convert::Into<i32> for Color {
     fn into(self) -> i32 {
         match self {
-            Color::Random => 0, 
-            Color::Invalid => 0, 
-            Color::Black => 1, 
-            Color::White => 2, 
+            Color::Random => -1,
+            Color::Invalid => -1,
+            Color::Black => 0,
+            Color::White => 1,
         }
     }
 }
