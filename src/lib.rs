@@ -51,6 +51,7 @@ impl std::ops::Not for Color {
 impl std::convert::From<i32> for Color {
     fn from(item: i32) -> Self {
         match item {
+            -1 => Color::Random,
             0 => Color::Black,
             1 => Color::White,
             _ => Color::Invalid,
