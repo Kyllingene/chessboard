@@ -882,6 +882,35 @@ impl Board {
         Ok(())
     }
 
+    pub fn uci_to_coords(sx: char, dx: char) -> Result<(u8, u8), String> {
+        Ok((
+            match sx {
+                'a' | 'A' => 0,
+                'b' | 'B' => 1,
+                'c' | 'C' => 2,
+                'd' | 'D' => 3,
+                'e' | 'E' => 4,
+                'f' | 'F' => 5,
+                'g' | 'G' => 6,
+                'h' | 'H' => 7,
+
+                _ => Err(format!("invalid src rank: {sx}"))?,
+            },
+            match dx {
+                'a' | 'A' => 0,
+                'b' | 'B' => 1,
+                'c' | 'C' => 2,
+                'd' | 'D' => 3,
+                'e' | 'E' => 4,
+                'f' | 'F' => 5,
+                'g' | 'G' => 6,
+                'h' | 'H' => 7,
+
+                _ => Err(format!("invalid dest rank: {dx}"))?,
+            },
+        ))
+    }
+
     pub fn uci(&mut self, uci: String, promote: Option<Piece>) -> Result<(), String> {
         if uci.len() != 4 {
             return Err(format!(
@@ -891,26 +920,17 @@ impl Board {
         }
 
         let chars = uci.chars().collect::<Vec<char>>();
-        let (sx, sy) = (
-            chars[0]
-                .to_string()
-                .parse()
-                .map_err(|_| format!("invalid src x coordinate: {}", chars[0]))?,
-            chars[1]
-                .to_string()
-                .parse()
-                .map_err(|_| format!("invalid src y coordinate: {}", chars[1]))?,
-        );
-        let (dx, dy) = (
-            chars[2]
-                .to_string()
-                .parse()
-                .map_err(|_| format!("invalid dest x coordinate: {}", chars[2]))?,
-            chars[3]
-                .to_string()
-                .parse()
-                .map_err(|_| format!("invalid dest y coordinate: {}", chars[3]))?,
-        );
+        let sy = chars[1]
+            .to_string()
+            .parse()
+            .map_err(|_| format!("invalid src file: {}", chars[1]))?;
+
+        let dy = chars[3]
+            .to_string()
+            .parse()
+            .map_err(|_| format!("invalid src file: {}", chars[3]))?;
+
+        let (sx, dx) = Self::uci_to_coords(chars[0], chars[2])?;
 
         self.move_piece(sx, sy, dx, dy, promote)
     }
