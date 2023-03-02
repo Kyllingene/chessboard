@@ -919,7 +919,7 @@ impl Board {
         ))
     }
 
-    pub fn uci(&mut self, uci: String, promote: Option<Piece>) -> Result<(), String> {
+    pub fn from_uci(uci: String) -> Result<((u8, u8), (u8, u8)), String> {
         if uci.len() != 4 {
             return Err(format!(
                 "UCI format uses 4 characters, recieved {}",
@@ -944,6 +944,11 @@ impl Board {
 
         let (sx, dx) = Self::uci_to_coords(chars[0], chars[2])?;
 
+        Ok(((sx, sy), (dx, dy)))
+    }
+
+    pub fn uci(&mut self, uci: String, promote: Option<Piece>) -> Result<(), String> {
+        let ((sx, sy), (dx, dy)) = Self::from_uci(uci)?;
         self.move_piece(sx, sy, dx, dy, promote)
     }
 }
