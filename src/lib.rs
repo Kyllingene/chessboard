@@ -975,9 +975,9 @@ impl Board {
                 5 => 'f',
                 6 => 'g',
                 7 => 'h',
-                _ => unreachable!()
+                _ => unreachable!(),
             },
-            sy+1,
+            sy + 1,
             match dx {
                 0 => 'a',
                 1 => 'b',
@@ -987,9 +987,9 @@ impl Board {
                 5 => 'f',
                 6 => 'g',
                 7 => 'h',
-                _ => unreachable!()
+                _ => unreachable!(),
             },
-            dy+1,
+            dy + 1,
         ))
     }
 
