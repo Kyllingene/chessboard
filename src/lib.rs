@@ -646,7 +646,7 @@ impl Board {
         }
 
         if black {
-            for ((sx, sy), (dx, dy)) in black_piece_moves(*self) {
+            for ((sx, sy), (dx, dy)) in white_piece_moves(*self) {
                 let mut test = *self;
 
                 let piece = if get_bit(self.pawns, sx, sy) {
