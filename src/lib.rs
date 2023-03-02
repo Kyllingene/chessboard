@@ -618,6 +618,10 @@ impl Board {
                 } else if get_bit(self.queens, sx, sy) {
                     Piece::Queen
                 } else if get_bit(self.kings, sx, sy) {
+                    // castling not allowed in check
+                    if (sx, sy) == (4, 0) && ((dx, dy) == (2, 0) || (dx, dy) == (6, 0)) {
+                        continue;
+                    }
                     Piece::King
                 } else {
                     panic!("internal error: {sx},{sy} is not empty, but is not a valid piece type");
@@ -646,7 +650,7 @@ impl Board {
         }
 
         if black {
-            for ((sx, sy), (dx, dy)) in white_piece_moves(*self) {
+            for ((sx, sy), (dx, dy)) in black_piece_moves(*self) {
                 let mut test = *self;
 
                 let piece = if get_bit(self.pawns, sx, sy) {
@@ -660,6 +664,10 @@ impl Board {
                 } else if get_bit(self.queens, sx, sy) {
                     Piece::Queen
                 } else if get_bit(self.kings, sx, sy) {
+                    // castling not allowed in check
+                    if (sx, sy) == (4, 7) && ((dx, dy) == (2, 7) || (dx, dy) == (7, 5)) {
+                        continue;
+                    }
                     Piece::King
                 } else {
                     panic!("internal error: {sx},{sy} is not empty, but is not a valid piece type");
@@ -924,14 +932,14 @@ impl Board {
             .parse::<u8>()
             .map_err(|_| format!("invalid src file: {}", chars[1]))?
             .checked_sub(1)
-            .ok_or(format!("0 is an invalid file"))?;
+            .ok_or("0 is an invalid file".to_string())?;
 
         let dy = chars[3]
             .to_string()
             .parse::<u8>()
             .map_err(|_| format!("invalid src file: {}", chars[3]))?
             .checked_sub(1)
-            .ok_or(format!("0 is an invalid file"))?;
+            .ok_or("0 is an invalid file".to_string())?;
 
         let (sx, dx) = Self::uci_to_coords(chars[0], chars[2])?;
 
