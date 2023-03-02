@@ -922,13 +922,17 @@ impl Board {
         let chars = uci.chars().collect::<Vec<char>>();
         let sy = chars[1]
             .to_string()
-            .parse()
-            .map_err(|_| format!("invalid src file: {}", chars[1]))?;
+            .parse::<u8>()
+            .map_err(|_| format!("invalid src file: {}", chars[1]))?
+            .checked_sub(1)
+            .ok_or(format!("0 is an invalid file"))?;
 
         let dy = chars[3]
             .to_string()
-            .parse()
-            .map_err(|_| format!("invalid src file: {}", chars[3]))?;
+            .parse::<u8>()
+            .map_err(|_| format!("invalid src file: {}", chars[3]))?
+            .checked_sub(1)
+            .ok_or(format!("0 is an invalid file"))?;
 
         let (sx, dx) = Self::uci_to_coords(chars[0], chars[2])?;
 
