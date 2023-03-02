@@ -947,6 +947,52 @@ impl Board {
         Ok(((sx, sy), (dx, dy)))
     }
 
+    pub fn to_uci(sx: u8, sy: u8, dx: u8, dy: u8) -> Result<String, String> {
+        if sx > 7 {
+            return Err(format!("sx must be 0..=7, not {sx}"));
+        }
+
+        if sy > 7 {
+            return Err(format!("sy must be 0..=7, not {sx}"));
+        }
+
+        if dx > 7 {
+            return Err(format!("dx must be 0..=7, not {sx}"));
+        }
+
+        if dy > 7 {
+            return Err(format!("dy must be 0..=7, not {sx}"));
+        }
+
+        Ok(format!(
+            "{}{}{}{}",
+            match sx {
+                0 => 'a',
+                1 => 'b',
+                2 => 'c',
+                3 => 'd',
+                4 => 'e',
+                5 => 'f',
+                6 => 'g',
+                7 => 'h',
+                _ => unreachable!()
+            },
+            sy,
+            match dx {
+                0 => 'a',
+                1 => 'b',
+                2 => 'c',
+                3 => 'd',
+                4 => 'e',
+                5 => 'f',
+                6 => 'g',
+                7 => 'h',
+                _ => unreachable!()
+            },
+            dy,
+        ))
+    }
+
     pub fn uci(&mut self, uci: String, promote: Option<Piece>) -> Result<(), String> {
         let ((sx, sy), (dx, dy)) = Self::from_uci(uci)?;
         self.move_piece(sx, sy, dx, dy, promote)
