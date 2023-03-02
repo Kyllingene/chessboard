@@ -682,7 +682,6 @@ impl Board {
                 }
 
                 if !test.check().1 {
-                    println!("{sx},{sy} -> {dx},{dy}");
                     black = false;
                 }
             }
