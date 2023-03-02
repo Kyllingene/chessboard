@@ -422,12 +422,13 @@ pub struct Board {
     rooks: u64,
     queens: u64,
     kings: u64,
-    en_passant_targets: u64,
 
-    white_can_castle: (bool, bool),
-    black_can_castle: (bool, bool),
+    pub en_passant_targets: u64,
 
-    whites_turn: bool,
+    pub white_can_castle: (bool, bool),
+    pub black_can_castle: (bool, bool),
+
+    pub whites_turn: bool,
 }
 
 impl Default for Board {
