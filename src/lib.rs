@@ -14,9 +14,9 @@ use std::cmp::max;
 #[allow(unused)]
 fn print_bitboard(bb: u64) {
     let board = bitboard_to_grid(bb);
-    for y in 0..8 {
-        for x in 0..8 {
-            print!("{} ", if board[x][y] { '1' } else { '0' });
+    for row in board {
+        for bit in row {
+            print!("{} ", if bit { '1' } else { '0' });
         }
         println!();
     }
@@ -25,18 +25,18 @@ fn print_bitboard(bb: u64) {
 pub fn bitboard_to_grid(mut bb: u64) -> [[bool; 8]; 8] {
     let mut rows = [0u8; 8];
     let mut grid = [[false; 8]; 8];
-    
+
     for x in &mut rows {
         *x = bb as u8;
         bb >>= 8;
     }
-        
+
     for (y, mut row) in rows.into_iter().enumerate() {
-        for x in 0..8 {
-            grid[x][y] = match row & 1 {
+        for col in &mut grid {
+            col[y] = match row & 1 {
                 0 => false,
                 1 => true,
-                _ => unreachable!("x & 1 == 0 or 1")
+                _ => unreachable!("x & 1 == 0 or 1"),
             };
             row >>= 1;
         }
@@ -48,9 +48,9 @@ pub fn bitboard_to_grid(mut bb: u64) -> [[bool; 8]; 8] {
 pub fn grid_to_coords(grid: [[bool; 8]; 8]) -> Vec<(u8, u8)> {
     let mut moves = Vec::new();
 
-    for x in 0..8 {
-        for y in 0..8 {
-            if grid[x][y] {
+    for (x, col) in grid.iter().enumerate() {
+        for (y, bit) in col.iter().enumerate() {
+            if *bit {
                 moves.push((x as u8, y as u8));
             }
         }
@@ -84,7 +84,14 @@ pub fn print_board(board: Board) {
                 'k'
             };
 
-            print!("{} ", if white { piece.to_ascii_uppercase() } else { piece });
+            print!(
+                "{} ",
+                if white {
+                    piece.to_ascii_uppercase()
+                } else {
+                    piece
+                }
+            );
         }
 
         println!();
@@ -173,38 +180,35 @@ pub fn toggle_bit(bb: u64, x: u8, y: u8) -> u64 {
 // might not support inlining the Fn(). is that actually true though?
 #[macro_export]
 macro_rules! slide_fn {
-    ($bb:expr, $stop:expr, $f:ident) => {
-        {           
-            let mut nbb = $f($bb, 1);
-            for _ in 0..7 {
-                nbb |= $f(!$stop & nbb, 1);
-            }
-            
-            nbb & !$bb
+    ($bb:expr, $stop:expr, $f:ident) => {{
+        let mut nbb = $f($bb, 1);
+        for _ in 0..7 {
+            nbb |= $f(!$stop & nbb, 1);
         }
-    };
+
+        nbb & !$bb
+    }};
 }
 
 #[inline]
 pub fn slide_horiz(bb: u64, stop: u64) -> u64 {
-    slide_fn!(bb, stop, bitboard_shu) |
-        slide_fn!(bb, stop, bitboard_shd) |
-        slide_fn!(bb, stop, bitboard_shl) |
-        slide_fn!(bb, stop, bitboard_shr)
+    slide_fn!(bb, stop, bitboard_shu)
+        | slide_fn!(bb, stop, bitboard_shd)
+        | slide_fn!(bb, stop, bitboard_shl)
+        | slide_fn!(bb, stop, bitboard_shr)
 }
 
 #[inline]
 pub fn slide_diag(bb: u64, stop: u64) -> u64 {
-    slide_fn!(bb, stop, bitboard_shul) |
-        slide_fn!(bb, stop, bitboard_shdl) |
-        slide_fn!(bb, stop, bitboard_shur) |
-        slide_fn!(bb, stop, bitboard_shdr)
+    slide_fn!(bb, stop, bitboard_shul)
+        | slide_fn!(bb, stop, bitboard_shdl)
+        | slide_fn!(bb, stop, bitboard_shur)
+        | slide_fn!(bb, stop, bitboard_shdr)
 }
 
 #[inline]
 pub fn slide_all(bb: u64, stop: u64) -> u64 {
-    slide_horiz(bb, stop) |
-        slide_diag(bb, stop)
+    slide_horiz(bb, stop) | slide_diag(bb, stop)
 }
 
 #[inline]
@@ -219,90 +223,104 @@ pub fn pawns_down(bb: u64, stop: u64) -> u64 {
 
 #[inline]
 pub fn pawns_double_up(bb: u64, stop: u64) -> u64 {
-    !stop & pawns_up(!stop & pawns_up(0b0000000011111111000000000000000000000000000000000000000000000000 & bb, stop), stop)
+    !stop
+        & pawns_up(
+            !stop
+                & pawns_up(
+                    0b0000000011111111000000000000000000000000000000000000000000000000 & bb,
+                    stop,
+                ),
+            stop,
+        )
 }
 
 #[inline]
 pub fn pawns_double_down(bb: u64, stop: u64) -> u64 {
-    pawns_down(pawns_down(0b0000000000000000000000000000000000000000000000001111111100000000 & bb, stop), stop)
+    pawns_down(
+        pawns_down(
+            0b0000000000000000000000000000000000000000000000001111111100000000 & bb,
+            stop,
+        ),
+        stop,
+    )
 }
 
 #[inline]
 pub fn pawns_capture_up(bb: u64, stop: u64) -> u64 {
-    !stop & (bitboard_shul(bb, 1) |
-        bitboard_shur(bb, 1))
+    !stop & (bitboard_shul(bb, 1) | bitboard_shur(bb, 1))
 }
 
 #[inline]
 pub fn pawns_capture_down(bb: u64, stop: u64) -> u64 {
-    !stop & (bitboard_shdl(bb, 1) |
-        bitboard_shdr(bb, 1))
+    !stop & (bitboard_shdl(bb, 1) | bitboard_shdr(bb, 1))
 }
 
 #[inline]
 pub fn knight_moves(bb: u64, stop: u64) -> u64 {
-    !stop & (bitboard_shu(bitboard_shl(bb, 1), 2) |
-        bitboard_shd(bitboard_shl(bb, 1), 2) |
-        bitboard_shu(bitboard_shr(bb, 1), 2) |
-        bitboard_shd(bitboard_shr(bb, 1), 2) |
-        bitboard_shu(bitboard_shl(bb, 2), 1) |
-        bitboard_shd(bitboard_shl(bb, 2), 1) |
-        bitboard_shu(bitboard_shr(bb, 2), 1) |
-        bitboard_shd(bitboard_shr(bb, 2), 1))
+    !stop
+        & (bitboard_shu(bitboard_shl(bb, 1), 2)
+            | bitboard_shd(bitboard_shl(bb, 1), 2)
+            | bitboard_shu(bitboard_shr(bb, 1), 2)
+            | bitboard_shd(bitboard_shr(bb, 1), 2)
+            | bitboard_shu(bitboard_shl(bb, 2), 1)
+            | bitboard_shd(bitboard_shl(bb, 2), 1)
+            | bitboard_shu(bitboard_shr(bb, 2), 1)
+            | bitboard_shd(bitboard_shr(bb, 2), 1))
 }
 
 #[inline]
 pub fn king_moves(bb: u64, stop: u64) -> u64 {
-    !stop & (bitboard_shur(bb, 1) |
-        bitboard_shu(bb, 1) |
-        bitboard_shul(bb, 1) |
-        bitboard_shl(bb, 1) |
-        bitboard_shdl(bb, 1) |
-        bitboard_shd(bb, 1) |
-        bitboard_shdr(bb, 1) |
-        bitboard_shr(bb, 1))
+    !stop
+        & (bitboard_shur(bb, 1)
+            | bitboard_shu(bb, 1)
+            | bitboard_shul(bb, 1)
+            | bitboard_shl(bb, 1)
+            | bitboard_shdl(bb, 1)
+            | bitboard_shd(bb, 1)
+            | bitboard_shdr(bb, 1)
+            | bitboard_shr(bb, 1))
 }
 
 #[inline]
 pub fn white_moves(board: Board) -> u64 {
-    pawns_up(board.pawns & board.white, board.white) |
-        pawns_double_down(board.pawns & board.white, board.white) |
-        knight_moves(board.knights & board.white, board.white) |
-        (slide_diag(board.bishops & board.white, board.white | board.black) & !board.white) |
-        (slide_horiz(board.rooks & board.white, board.white | board.black) & !board.white) |
-        (slide_all(board.queens & board.white, board.white | board.black) & !board.white) |
-        king_moves(board.kings & board.white, board.white)
+    pawns_up(board.pawns & board.white, board.white)
+        | pawns_double_down(board.pawns & board.white, board.white)
+        | knight_moves(board.knights & board.white, board.white)
+        | (slide_diag(board.bishops & board.white, board.white | board.black) & !board.white)
+        | (slide_horiz(board.rooks & board.white, board.white | board.black) & !board.white)
+        | (slide_all(board.queens & board.white, board.white | board.black) & !board.white)
+        | king_moves(board.kings & board.white, board.white)
 }
 
 #[inline]
 pub fn black_moves(board: Board) -> u64 {
-    pawns_up(board.pawns & board.black, board.black) |
-        pawns_double_down(board.pawns & board.black, board.black) |
-        knight_moves(board.knights & board.black, board.black) |
-        (slide_diag(board.bishops & board.black, board.black | board.white) & !board.black) |
-        (slide_horiz(board.rooks & board.black, board.black | board.white) & !board.black) |
-        (slide_all(board.queens & board.black, board.black | board.white) & !board.black) |
-        king_moves(board.kings & board.black, board.black)
+    pawns_up(board.pawns & board.black, board.black)
+        | pawns_double_down(board.pawns & board.black, board.black)
+        | knight_moves(board.knights & board.black, board.black)
+        | (slide_diag(board.bishops & board.black, board.black | board.white) & !board.black)
+        | (slide_horiz(board.rooks & board.black, board.black | board.white) & !board.black)
+        | (slide_all(board.queens & board.black, board.black | board.white) & !board.black)
+        | king_moves(board.kings & board.black, board.black)
 }
 
 #[inline]
 pub fn white_captures(board: Board) -> u64 {
-    pawns_capture_down(board.pawns & board.white, board.white) |
-            knight_moves(board.knights & board.white, board.white) |
-            (slide_diag(board.bishops & board.white, board.white | board.black) & !board.white) |
-            (slide_horiz(board.rooks & board.white, board.white | board.black) & !board.white) |
-            (slide_all(board.queens & board.white, board.white | board.black) & !board.white) |
-            king_moves(board.kings & board.white, board.white)
+    pawns_capture_down(board.pawns & board.white, board.white)
+        | knight_moves(board.knights & board.white, board.white)
+        | (slide_diag(board.bishops & board.white, board.white | board.black) & !board.white)
+        | (slide_horiz(board.rooks & board.white, board.white | board.black) & !board.white)
+        | (slide_all(board.queens & board.white, board.white | board.black) & !board.white)
+        | king_moves(board.kings & board.white, board.white)
 }
 
 #[inline]
 pub fn black_captures(board: Board) -> u64 {
-    pawns_capture_up(board.pawns & board.black, board.black) |
-            knight_moves(board.knights & board.black, board.black) |
-            (slide_diag(board.bishops & board.black, board.white | board.black) & !board.black) |
-            (slide_horiz(board.rooks & board.black, board.white | board.black) & !board.black) |
-            (slide_all(board.queens & board.black, board.white | board.black) & !board.black) |
-            king_moves(board.kings & board.black, board.black)
+    pawns_capture_up(board.pawns & board.black, board.black)
+        | knight_moves(board.knights & board.black, board.black)
+        | (slide_diag(board.bishops & board.black, board.white | board.black) & !board.black)
+        | (slide_horiz(board.rooks & board.black, board.white | board.black) & !board.black)
+        | (slide_all(board.queens & board.black, board.white | board.black) & !board.black)
+        | king_moves(board.kings & board.black, board.black)
 }
 
 pub fn piece_moves(board: Board, x: u8, y: u8) -> u64 {
@@ -321,13 +339,15 @@ pub fn piece_moves(board: Board, x: u8, y: u8) -> u64 {
 
     if get_bit(board.pawns, x, y) {
         if white {
-            !mine & (pawns_down(bit, other) |
-                pawns_double_down(bit, mine | other) |
-                ((board.en_passant_targets | other) & pawns_capture_down(bit, mine)))
+            !mine
+                & (pawns_down(bit, other)
+                    | pawns_double_down(bit, mine | other)
+                    | ((board.en_passant_targets | other) & pawns_capture_down(bit, mine)))
         } else {
-            !mine & (pawns_up(bit, other) |
-                pawns_double_up(bit, mine | other) |
-                ((board.en_passant_targets | other) & pawns_capture_up(bit, mine)))
+            !mine
+                & (pawns_up(bit, other)
+                    | pawns_double_up(bit, mine | other)
+                    | ((board.en_passant_targets | other) & pawns_capture_up(bit, mine)))
         }
     } else if get_bit(board.knights, x, y) {
         knight_moves(bit, mine)
@@ -338,9 +358,17 @@ pub fn piece_moves(board: Board, x: u8, y: u8) -> u64 {
     } else if get_bit(board.queens, x, y) {
         !mine & slide_all(bit, mine | other)
     } else if get_bit(board.kings, x, y) {
-        !mine & king_moves(bit, mine) |
-            (if castle.0 {set_bit(0, 6, if white {0} else {7})} else {0}) |
-            (if castle.1 {set_bit(0, 2, if white {0} else {7})} else {0})
+        !mine & king_moves(bit, mine)
+            | (if castle.0 {
+                set_bit(0, 6, if white { 0 } else { 7 })
+            } else {
+                0
+            })
+            | (if castle.1 {
+                set_bit(0, 2, if white { 0 } else { 7 })
+            } else {
+                0
+            })
     } else {
         0
     }
@@ -372,7 +400,7 @@ pub fn black_piece_moves(board: Board) -> Vec<((u8, u8), (u8, u8))> {
             if get_bit(board.white, x, y) {
                 continue;
             }
-            
+
             let moves = grid_to_coords(bitboard_to_grid(piece_moves(board, x, y)));
 
             for m in moves {
@@ -417,7 +445,7 @@ impl Default for Board {
 
             white_can_castle: (true, true),
             black_can_castle: (true, true),
-        
+
             whites_turn: true,
         }
     }
@@ -426,7 +454,7 @@ impl Default for Board {
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Color {
     White,
-    Black
+    Black,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -472,7 +500,7 @@ impl From<&str> for Board {
             }
         }
 
-        board.whites_turn = if state.side_to_play == fen::Color::White { true } else { false };
+        board.whites_turn = state.side_to_play == fen::Color::White;
 
         board
     }
@@ -502,7 +530,11 @@ impl Board {
         let mut grid = [[(None, Color::Black); 8]; 8];
         for y in 0..8 {
             for x in 0..8 {
-                let c = if get_bit(self.white, x, y) { Color::White } else { Color::Black };
+                let c = if get_bit(self.white, x, y) {
+                    Color::White
+                } else {
+                    Color::Black
+                };
                 let p = if get_bit(self.pawns, x, y) {
                     Some(Piece::Pawn)
                 } else if get_bit(self.knights, x, y) {
@@ -544,7 +576,7 @@ impl Board {
             Piece::Bishop => self.bishops = set_bit(self.bishops, x, y),
             Piece::Rook => self.rooks = set_bit(self.rooks, x, y),
             Piece::Queen => self.queens = set_bit(self.queens, x, y),
-            Piece::King => self.kings = set_bit(self.kings, x, y)
+            Piece::King => self.kings = set_bit(self.kings, x, y),
         }
     }
 
@@ -561,7 +593,10 @@ impl Board {
 
     pub fn check(&self) -> (bool, bool) {
         // TODO: CONFIRM that this is EXHAUSTIVE
-        (black_captures(*self) & self.kings != 0, white_captures(*self) & self.kings != 0)
+        (
+            black_captures(*self) & self.kings != 0,
+            white_captures(*self) & self.kings != 0,
+        )
     }
 
     pub fn mate(&self) -> (bool, bool) {
@@ -571,7 +606,7 @@ impl Board {
         if white {
             for ((sx, sy), (dx, dy)) in white_piece_moves(*self) {
                 let mut test = *self;
-                
+
                 let piece = if get_bit(self.pawns, sx, sy) {
                     Piece::Pawn
                 } else if get_bit(self.knights, sx, sy) {
@@ -587,17 +622,17 @@ impl Board {
                 } else {
                     panic!("internal error: {sx},{sy} is not empty, but is not a valid piece type");
                 };
-                
+
                 test.white = unset_bit(test.white, sx, sy);
                 test.black = unset_bit(test.black, sx, sy);
 
                 test.unset(dx, dy);
                 test.unset(sx, sy);
-                test.set(piece, Color::White , dx, dy);
+                test.set(piece, Color::White, dx, dy);
 
                 if get_bit(test.en_passant_targets, dx, dy) {
                     test.en_passant_targets = unset_bit(test.en_passant_targets, dx, dy);
-                    
+
                     // if you took an en passant target, the target has to be
                     // on a certain rank (dependent on color), and on the same file
                     // that you're moving to
@@ -613,7 +648,7 @@ impl Board {
         if black {
             for ((sx, sy), (dx, dy)) in black_piece_moves(*self) {
                 let mut test = *self;
-                
+
                 let piece = if get_bit(self.pawns, sx, sy) {
                     Piece::Pawn
                 } else if get_bit(self.knights, sx, sy) {
@@ -629,7 +664,7 @@ impl Board {
                 } else {
                     panic!("internal error: {sx},{sy} is not empty, but is not a valid piece type");
                 };
-                
+
                 test.white = unset_bit(test.white, sx, sy);
                 test.black = unset_bit(test.black, sx, sy);
 
@@ -639,11 +674,11 @@ impl Board {
 
                 if get_bit(test.en_passant_targets, dx, dy) {
                     test.en_passant_targets = unset_bit(test.en_passant_targets, dx, dy);
-                    
+
                     // if you took an en passant target, the target has to be
                     // on a certain rank (dependent on color), and on the same file
                     // that you're moving to
-                    test.unset(dx, 3 );
+                    test.unset(dx, 3);
                 }
 
                 if !test.check().1 {
@@ -656,7 +691,14 @@ impl Board {
         (white, black)
     }
 
-    pub fn move_piece(&mut self, sx: u8, sy: u8, dx: u8, dy: u8, promote: Option<Piece>) -> Result<(), String> {
+    pub fn move_piece(
+        &mut self,
+        sx: u8,
+        sy: u8,
+        dx: u8,
+        dy: u8,
+        promote: Option<Piece>,
+    ) -> Result<(), String> {
         if max(max(sx, sy), max(dx, dy)) > 7 {
             return Err("coordinates must be within the range `1..=7`".to_string());
         }
@@ -668,7 +710,10 @@ impl Board {
         let white = get_bit(self.white, sx, sy);
 
         if white != self.whites_turn {
-            return Err(format!("it's not {}'s turn", if white { "white" } else { "black" }));
+            return Err(format!(
+                "it's not {}'s turn",
+                if white { "white" } else { "black" }
+            ));
         }
 
         let piece = if get_bit(self.pawns, sx, sy) {
@@ -684,12 +729,16 @@ impl Board {
         } else if get_bit(self.kings, sx, sy) {
             Piece::King
         } else {
-            return Err(format!("internal error: {sx},{sy} is not empty, but is not a valid piece type"));
+            return Err(format!(
+                "internal error: {sx},{sy} is not empty, but is not a valid piece type"
+            ));
         };
 
         let moves = grid_to_coords(bitboard_to_grid(piece_moves(*self, sx, sy)));
         if !moves.contains(&(dx, dy)) {
-            return Err(format!("the move {sx},{sy} -> {dx},{dy} is not a valid move"));
+            return Err(format!(
+                "the move {sx},{sy} -> {dx},{dy} is not a valid move"
+            ));
         }
 
         let mut test = *self;
@@ -702,7 +751,7 @@ impl Board {
 
         if piece == Piece::Pawn && get_bit(test.en_passant_targets, dx, dy) {
             test.en_passant_targets = unset_bit(test.en_passant_targets, dx, dy);
-            
+
             // if you took an en passant target, the target has to be
             // on a certain rank (dependent on color), and on the same file
             // that you're moving to
@@ -714,7 +763,9 @@ impl Board {
                 if (test.white | test.black) & 0b01100000 != 0 {
                     return Err("cannot short castle as white: pieces are in the way".to_string());
                 } else if black_captures(test) & 0b01110000 != 0 {
-                    return Err("cannot short castle as white: would castle through check".to_string());
+                    return Err(
+                        "cannot short castle as white: would castle through check".to_string()
+                    );
                 } else {
                     test.set(Piece::King, Color::White, dx, dy);
                     test.unset(7, 0);
@@ -724,21 +775,30 @@ impl Board {
                 if (test.white | test.black) & 0b00001110 != 0 {
                     return Err("cannot long castle as white: pieces are in the way".to_string());
                 } else if black_captures(test) & 0b00011100 != 0 {
-                    return Err("cannot long castle as white: would castle through check".to_string());
+                    return Err(
+                        "cannot long castle as white: would castle through check".to_string()
+                    );
                 } else {
                     test.set(Piece::King, Color::White, dx, dy);
                     test.unset(0, 0);
                     test.set(Piece::Rook, Color::White, 3, 0);
                 }
             } else {
-                test.set(piece, if white { Color::White } else { Color::Black }, dx, dy);
+                test.set(
+                    piece,
+                    if white { Color::White } else { Color::Black },
+                    dx,
+                    dy,
+                );
             }
         } else if piece == Piece::King && !white {
             if (sx, sy, dx, dy) == (4, 7, 6, 7) {
                 if (test.white | test.black) & (0b01100000 << 56) != 0 {
                     return Err("cannot short castle as black: pieces are in the way".to_string());
                 } else if white_captures(test) & (0b01110000 << 56) != 0 {
-                    return Err("cannot short castle as black: would castle through check".to_string());
+                    return Err(
+                        "cannot short castle as black: would castle through check".to_string()
+                    );
                 } else {
                     test.set(Piece::King, Color::Black, dx, dy);
                     test.unset(7, 7);
@@ -748,30 +808,51 @@ impl Board {
                 if (test.white | test.black) & (0b00001110 << 56) != 0 {
                     return Err("cannot long castle as black: pieces are in the way".to_string());
                 } else if white_captures(test) & (0b00011100 << 56) != 0 {
-                    return Err("cannot long castle as black: would castle through check".to_string());
+                    return Err(
+                        "cannot long castle as black: would castle through check".to_string()
+                    );
                 } else {
                     test.set(Piece::King, Color::Black, dx, dy);
                     test.unset(0, 7);
                     test.set(Piece::Rook, Color::Black, 3, 7);
                 }
             } else {
-                test.set(piece, if white { Color::White } else { Color::Black }, dx, dy);
+                test.set(
+                    piece,
+                    if white { Color::White } else { Color::Black },
+                    dx,
+                    dy,
+                );
             }
         } else if piece == Piece::Pawn && (dy == 7 || dy == 0) {
-            test.set(promote.unwrap_or(Piece::Queen), if white { Color::White } else { Color::Black }, dx, dy);
+            test.set(
+                promote.unwrap_or(Piece::Queen),
+                if white { Color::White } else { Color::Black },
+                dx,
+                dy,
+            );
         } else {
-            test.set(piece, if white { Color::White } else { Color::Black }, dx, dy);
+            test.set(
+                piece,
+                if white { Color::White } else { Color::Black },
+                dx,
+                dy,
+            );
         }
 
         if white && test.check().0 {
-            return Err(format!("the move {sx},{sy} -> {dx},{dy} is not a legal move (puts white in check)"))
+            return Err(format!(
+                "the move {sx},{sy} -> {dx},{dy} is not a legal move (puts white in check)"
+            ));
         } else if !white && test.check().1 {
-            return Err(format!("the move {sx},{sy} -> {dx},{dy} is not a legal move (puts black in check)"))
+            return Err(format!(
+                "the move {sx},{sy} -> {dx},{dy} is not a legal move (puts black in check)"
+            ));
         }
 
         *self = test;
         self.en_passant_targets = 0;
-        
+
         if piece == Piece::Pawn {
             if white && sy == 6 && dy == 4 {
                 self.en_passant_targets = set_bit(self.en_passant_targets, dx, 5);
@@ -800,6 +881,39 @@ impl Board {
 
         Ok(())
     }
+
+    pub fn uci(&mut self, uci: String, promote: Option<Piece>) -> Result<(), String> {
+        if uci.len() != 4 {
+            return Err(format!(
+                "UCI format uses 4 characters, recieved {}",
+                uci.len()
+            ));
+        }
+
+        let chars = uci.chars().collect::<Vec<char>>();
+        let (sx, sy) = (
+            chars[0]
+                .to_string()
+                .parse()
+                .map_err(|_| format!("invalid src x coordinate: {}", chars[0]))?,
+            chars[1]
+                .to_string()
+                .parse()
+                .map_err(|_| format!("invalid src y coordinate: {}", chars[1]))?,
+        );
+        let (dx, dy) = (
+            chars[2]
+                .to_string()
+                .parse()
+                .map_err(|_| format!("invalid dest x coordinate: {}", chars[2]))?,
+            chars[3]
+                .to_string()
+                .parse()
+                .map_err(|_| format!("invalid dest y coordinate: {}", chars[3]))?,
+        );
+
+        self.move_piece(sx, sy, dx, dy, promote)
+    }
 }
 
 #[cfg(test)]
@@ -817,7 +931,7 @@ mod tests {
         other = set_bit(other, 3, 6);
 
         let moves = slide_all(queens, other);
-        
+
         println!("\n\n === queen ===");
         print_bitboard(queens);
 
@@ -839,8 +953,7 @@ mod tests {
         other = set_bit(other, 6, 7);
 
         let takes = pawns_capture_down(pawns, other);
-        let moves = pawns_down(pawns, other) |
-            pawns_double_down(pawns, other);
+        let moves = pawns_down(pawns, other) | pawns_double_down(pawns, other);
 
         println!("\n\n === takes ===");
         print_bitboard(takes);
@@ -934,7 +1047,7 @@ mod tests {
 
         println!("\n\n == default == ");
         print_board(Board::default());
-        
+
         println!("\n\n == initial == ");
         print_board(board);
 
