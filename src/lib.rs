@@ -977,7 +977,7 @@ impl Board {
                 7 => 'h',
                 _ => unreachable!()
             },
-            sy,
+            sy+1,
             match dx {
                 0 => 'a',
                 1 => 'b',
@@ -989,7 +989,7 @@ impl Board {
                 7 => 'h',
                 _ => unreachable!()
             },
-            dy,
+            dy+1,
         ))
     }
 
