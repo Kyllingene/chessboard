@@ -1,4 +1,4 @@
-// 0b0101010100110011000011110000000011110000110011001010101011110111
+// 0b0101010100110011000011110000000011110000110011001010101011111111
 // =>
 // 0 1 0 1 0 1 0 1
 // 0 0 1 1 0 0 1 1
@@ -7,7 +7,7 @@
 // 1 1 1 1 0 0 0 0
 // 1 1 0 0 1 1 0 0
 // 1 0 1 0 1 0 1 0
-// 1 1 1 1 0 1 1 1
+// 1 1 1 1 1 1 1 1
 
 use std::cmp::max;
 
@@ -892,27 +892,27 @@ impl Board {
 
     pub fn uci_to_coords(sx: char, dx: char) -> Result<(u8, u8), String> {
         Ok((
-            match sx {
-                'a' | 'A' => 0,
-                'b' | 'B' => 1,
-                'c' | 'C' => 2,
-                'd' | 'D' => 3,
-                'e' | 'E' => 4,
-                'f' | 'F' => 5,
-                'g' | 'G' => 6,
-                'h' | 'H' => 7,
+            match sx.to_ascii_lowercase() {
+                'a' => 0,
+                'b' => 1,
+                'c' => 2,
+                'd' => 3,
+                'e' => 4,
+                'f' => 5,
+                'g' => 6,
+                'h' => 7,
 
                 _ => Err(format!("invalid src rank: {sx}"))?,
             },
-            match dx {
-                'a' | 'A' => 0,
-                'b' | 'B' => 1,
-                'c' | 'C' => 2,
-                'd' | 'D' => 3,
-                'e' | 'E' => 4,
-                'f' | 'F' => 5,
-                'g' | 'G' => 6,
-                'h' | 'H' => 7,
+            match dx.to_ascii_lowercase() {
+                'a' => 0,
+                'b' => 1,
+                'c' => 2,
+                'd' => 3,
+                'e' => 4,
+                'f' => 5,
+                'g' => 6,
+                'h' => 7,
 
                 _ => Err(format!("invalid dest rank: {dx}"))?,
             },
@@ -948,25 +948,9 @@ impl Board {
     }
 
     pub fn to_uci(sx: u8, sy: u8, dx: u8, dy: u8) -> Result<String, String> {
-        if sx > 7 {
-            return Err(format!("sx must be 0..=7, not {sx}"));
-        }
-
-        if sy > 7 {
-            return Err(format!("sy must be 0..=7, not {sx}"));
-        }
-
-        if dx > 7 {
-            return Err(format!("dx must be 0..=7, not {sx}"));
-        }
-
-        if dy > 7 {
-            return Err(format!("dy must be 0..=7, not {sx}"));
-        }
-
         Ok(format!(
             "{}{}{}{}",
-            match sx {
+            match sx & 7 {
                 0 => 'a',
                 1 => 'b',
                 2 => 'c',
@@ -978,7 +962,7 @@ impl Board {
                 _ => unreachable!(),
             },
             sy + 1,
-            match dx {
+            match dx & 7 {
                 0 => 'a',
                 1 => 'b',
                 2 => 'c',
