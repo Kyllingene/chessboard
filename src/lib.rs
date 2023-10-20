@@ -9,8 +9,6 @@
 // 1 0 1 0 1 0 1 0
 // 1 1 1 1 1 1 1 1
 
-use std::cmp::max;
-
 #[allow(unused)]
 fn print_bitboard(bb: u64) {
     let board = bitboard_to_grid(bb);
@@ -20,6 +18,7 @@ fn print_bitboard(bb: u64) {
         }
         println!();
     }
+    println!();
 }
 
 pub fn bitboard_to_grid(mut bb: u64) -> [[bool; 8]; 8] {
@@ -101,15 +100,7 @@ pub fn bitboard_shdr(bb: u64, i: u8) -> u64 {
 
 #[inline]
 pub fn bitxy(x: u8, y: u8) -> u64 {
-    if x == 0 && y == 0 {
-        1u64
-    } else if x == 0 {
-        bitboard_shd(1, y)
-    } else if y == 0 {
-        bitboard_shr(1, x)
-    } else {
-        bitboard_shd(bitboard_shr(1, x), y)
-    }
+    bitboard_shd(bitboard_shr(1, x), y)
 }
 
 #[inline]
@@ -130,5 +121,30 @@ pub fn get_bit(bb: u64, x: u8, y: u8) -> bool {
 #[inline]
 pub fn toggle_bit(bb: u64, x: u8, y: u8) -> u64 {
     bb ^ bitxy(x, y)
+}
+
+#[inline]
+pub fn file(x: u8) -> u64 {
+    0xff << (x * 8)
+}
+
+#[inline]
+pub fn row(y: u8) -> u64 {
+    0x0101010101010101 << y
+}
+
+#[inline]
+pub fn to_right(x: u8) -> u64 {
+    !0 << (x * 8)
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn indev() {
+        print_bitboard(to_right(4) & row(3));
+    }
 }
 
