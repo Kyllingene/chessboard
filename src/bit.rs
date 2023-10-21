@@ -24,4 +24,3 @@ pub fn get(bb: u64, x: u8, y: u8) -> bool {
 pub fn toggle(bb: u64, x: u8, y: u8) -> u64 {
     bb ^ xy(x, y)
 }
-

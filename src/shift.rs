@@ -1,11 +1,13 @@
+use crate::mask;
+
 #[inline]
 pub fn right(bb: u64, i: u8) -> u64 {
-    (bb >> i) & 0b0111111101111111011111110111111101111111011111110111111101111111
+    (bb >> i) & mask::right(i)
 }
 
 #[inline]
 pub fn left(bb: u64, i: u8) -> u64 {
-    (bb << i) & 0b1111111011111110111111101111111011111110111111101111111011111110
+    (bb << i) & mask::left(i)
 }
 
 #[inline]

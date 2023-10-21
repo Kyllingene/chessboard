@@ -12,10 +12,10 @@
 
 mod bit;
 mod helper;
-mod shift;
-mod slide;
 mod mask;
 mod precompute;
+mod shift;
+mod slide;
 
 #[cfg(test)]
 mod test;
@@ -64,4 +64,3 @@ pub fn grid_to_coords(grid: [[bool; 8]; 8]) -> Vec<(u8, u8)> {
 
     moves
 }
-

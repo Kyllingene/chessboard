@@ -1,4 +1,4 @@
-use crate::{shift, helper};
+use crate::{helper, shift};
 
 #[inline]
 pub fn file(x: u8) -> u64 {
@@ -54,25 +54,25 @@ pub fn down(y: u8) -> u64 {
 
 #[inline]
 pub fn left(x: u8) -> u64 {
-    0xff << x
-        | 0xff << (x + 8)
-        | 0xff << (x + 16)
-        | 0xff << (x + 24)
-        | 0xff << (x + 32)
-        | 0xff << (x + 40)
-        | 0xff << (x + 48)
-        | 0xff << (x + 56)
+    let x = x + 1;
+    helper::shl(0xff, x) & 0xff
+        | (helper::shl(0xff, x) & 0xff) << 8
+        | (helper::shl(0xff, x) & 0xff) << 16
+        | (helper::shl(0xff, x) & 0xff) << 24
+        | (helper::shl(0xff, x) & 0xff) << 32
+        | (helper::shl(0xff, x) & 0xff) << 40
+        | (helper::shl(0xff, x) & 0xff) << 48
+        | (helper::shl(0xff, x) & 0xff) << 56
 }
 
 #[inline]
 pub fn right(x: u8) -> u64 {
-    0xff >> x
-        | 0xff >> (x + 8)
-        | 0xff >> (x + 16)
-        | 0xff >> (x + 24)
-        | 0xff >> (x + 32)
-        | 0xff >> (x + 40)
-        | 0xff >> (x + 48)
-        | helper::shr(0xff, x + 56)
+    helper::shr(0xff, x) & 0xff
+        | (helper::shr(0xff, x) & 0xff) << 8
+        | (helper::shr(0xff, x) & 0xff) << 16
+        | (helper::shr(0xff, x) & 0xff) << 24
+        | (helper::shr(0xff, x) & 0xff) << 32
+        | (helper::shr(0xff, x) & 0xff) << 40
+        | (helper::shr(0xff, x) & 0xff) << 48
+        | (helper::shr(0xff, x) & 0xff) << 56
 }
-
