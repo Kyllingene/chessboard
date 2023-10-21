@@ -11,9 +11,11 @@
 // 1 1 1 1 1 1 1 1
 
 mod bit;
+mod board;
+mod error;
 mod helper;
 mod mask;
-mod precompute;
+mod piece;
 mod shift;
 mod slide;
 
