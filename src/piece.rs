@@ -1,9 +1,9 @@
-use crate::{shift, slide};
+use crate::{bit, shift, slide, Color, Piece, PieceKind};
 
 #[macro_export]
-macro_rules! not_mine {
-    ( $( $fn:expr ),* => $( $bb:expr ),* ; $stop:expr, $mine:expr ) => {
-        (0 $( | $fn($bb & $mine, $stop) )*) & !$mine
+macro_rules! coverage {
+    ( $( $fn:expr ),* => $( $bb:expr ),* ; $mine:expr, $other:expr $(,)? ) => {
+        (0 $( | $fn($bb & $mine, $mine | $other) )*)
     }
 }
 
@@ -58,4 +58,20 @@ pub fn pawn_down(bb: u64, stop: u64) -> u64 {
 #[inline]
 pub fn pawn_up(bb: u64, stop: u64) -> u64 {
     shift::up(bb, 1) | (shift::up_left(bb, 1) & stop) | (shift::up_right(bb, 1) & stop)
+}
+
+#[inline]
+pub fn piece(x: u8, y: u8, piece: Piece, stop: u64) -> u64 {
+    let bb = bit::xy(x, y);
+    match piece.kind {
+        PieceKind::Pawn => match piece.color {
+            Color::White => pawn_up(bb, stop),
+            Color::Black => pawn_down(bb, stop),
+        },
+        PieceKind::Knight => knight(bb, stop),
+        PieceKind::Bishop => bishop(bb, stop),
+        PieceKind::Rook => rook(bb, stop),
+        PieceKind::Queen => queen(bb, stop),
+        PieceKind::King => king(bb, stop),
+    }
 }

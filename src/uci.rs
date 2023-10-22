@@ -49,7 +49,7 @@ pub fn one(s: &str) -> Result<Uci, UciError> {
         _ => return Err(UciError::InvalidFile(file)),
     };
 
-    Ok((rank, file))
+    Ok((file, rank))
 }
 
 /// Parse two UCI coordinates, side-by-side or separated by a space.

@@ -1,15 +1,15 @@
 use super::Board;
 use crate::error::{BoardError, BoardResult};
-use crate::{bit, not_mine, piece};
+use crate::{bit, coverage, helper, piece};
 
 use pfen::Color;
 
 impl Board {
     /// Returns all the squares that color is attacking.
     pub fn coverage(&self, color: Color) -> u64 {
-        let mine = match color {
-            Color::White => self.white,
-            Color::Black => self.black,
+        let (mine, other) = match color {
+            Color::White => (self.white, self.black),
+            Color::Black => (self.black, self.white),
         };
 
         let pawn: fn(u64, u64) -> u64 = match color {
@@ -17,7 +17,7 @@ impl Board {
             Color::Black => piece::pawn_down,
         };
 
-        not_mine!(
+        coverage!(
             pawn,
             piece::knight,
             piece::bishop,
@@ -31,8 +31,8 @@ impl Board {
             self.queens,
             self.kings;
 
-            self.white | self.black,
-            mine
+            mine,
+            other,
         )
     }
 
@@ -61,7 +61,7 @@ impl Board {
 
         if let Some(target) = target {
             if piece.color == target.color {
-                return Err(BoardError::SquareIsOccupied(x, y)); 
+                return Err(BoardError::SquareIsOccupied(x, y));
             }
         }
 
@@ -71,12 +71,23 @@ impl Board {
 
     pub fn legal(&self, from: (u8, u8), to: (u8, u8)) -> bool {
         let (fx, fy) = from;
-        let Ok(piece) = self.get(fx, fy) else { return false; };
+        let Ok(piece) = self.get(fx, fy) else {
+            return false;
+        };
 
-        let Some(piece) = piece else { return false; };
+        let Some(piece) = piece else {
+            return false;
+        };
+
+        let (mine, other) = match piece.color {
+            Color::White => (self.white, self.black),
+            Color::Black => (self.black, self.white),
+        };
 
         let (tx, ty) = to;
-        let Ok(target) = self.get(tx, ty) else { return false; };
+        let Ok(target) = self.get(tx, ty) else {
+            return false;
+        };
 
         if let Some(target) = target {
             if piece.color == target.color {
@@ -84,11 +95,20 @@ impl Board {
             }
         }
 
-        let Ok(future) = self.future(from, to) else { return false; };
+        let Ok(future) = self.future(from, to) else {
+            return false;
+        };
 
         if future.in_check(piece.color) {
             return false;
         }
+
+        let moves = piece::piece(fx, fy, piece, mine | other) & !mine;
+        if !helper::bitboard_to_coords_contains(moves, tx, ty) {
+            return false;
+        }
+
+        // TODO: castling
 
         true
     }

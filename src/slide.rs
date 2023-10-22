@@ -3,14 +3,15 @@ use crate::{helper, mask, shift};
 macro_rules! slide_fn {
     ( $outer:meta, $name:ident, $fn:expr ) => {
         #[$outer]
-        /// until it hits a stop bit. Includes any stop bits hit.
+        /// until it hits a stop bit. Includes any stop bits hit,
+        /// but not the original bitboard.
         #[inline]
         pub fn $name(bb: u64, stop: u64) -> u64 {
             let f: fn(u64, u8) -> u64 = $fn;
             let mut out = f(bb, 1);
 
             for _ in 0..7 {
-                out |= f(!stop & out, 1);
+                out |= f(out & !stop, 1);
             }
 
             out & !bb
@@ -25,20 +26,20 @@ macro_rules! slide_fns {
 }
 
 slide_fns!(
-    /// Slide upwards
+    /// Slides upwards
     , up, shift::up,
-    /// Slide downwards
+    /// Slides downwards
     , down, shift::down,
-    /// Slide to the right
+    /// Slides to the right
     , right, shift::right,
-    /// Slide to the left
+    /// Slides to the left
     , left, shift::left,
-    /// Slide diagonally up-right
+    /// Slides diagonally up-right
     , diag_right, shift::up_right,
-    /// Slide diagonally down-left
+    /// Slides diagonally down-left
     , diag_left, shift::down_left,
-    /// Slide diagonally up-left
+    /// Slides diagonally up-left
     , anti_diag_right, shift::up_left,
-    /// Slide diagonally down-right
+    /// Slides diagonally down-right
     , anti_diag_left, shift::down_right,
 );

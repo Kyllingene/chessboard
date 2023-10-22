@@ -12,8 +12,8 @@ dependencies = [
 
 [[package]]
 name = "pfen"
-version = "1.1.1"
-source = "git+https://github.com/kyllingene/pfen#db624e231ac4fd6b9e6e1d38c7c12616af41345b"
+version = "1.1.2"
+source = "git+https://github.com/kyllingene/pfen#035edfcf6b394e437bd92662ddc95173085c998d"
 dependencies = [
  "thiserror",
 ]

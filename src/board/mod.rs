@@ -4,7 +4,7 @@ use pfen::PfenError;
 
 use crate::error::{BoardError, BoardResult};
 use crate::uci::{self, UciError};
-use crate::{bit, not_mine, piece};
+use crate::{bit, piece};
 use crate::{Castling, Color, Piece, PieceKind};
 
 mod movegen;
