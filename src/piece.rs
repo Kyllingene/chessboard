@@ -1,4 +1,4 @@
-use crate::{slide, shift};
+use crate::{shift, slide};
 
 #[macro_export]
 macro_rules! not_mine {
@@ -9,10 +9,7 @@ macro_rules! not_mine {
 
 #[inline]
 pub fn rook(bb: u64, stop: u64) -> u64 {
-    slide::up(bb, stop)
-        | slide::down(bb, stop)
-        | slide::left(bb, stop)
-        | slide::right(bb, stop)
+    slide::up(bb, stop) | slide::down(bb, stop) | slide::left(bb, stop) | slide::right(bb, stop)
 }
 
 #[inline]
@@ -55,15 +52,10 @@ pub fn knight(bb: u64, _: u64) -> u64 {
 
 #[inline]
 pub fn pawn_down(bb: u64, stop: u64) -> u64 {
-    shift::down(bb, 1)
-        | (shift::down_left(bb, 1) & stop)
-        | (shift::down_right(bb, 1) & stop)
+    shift::down(bb, 1) | (shift::down_left(bb, 1) & stop) | (shift::down_right(bb, 1) & stop)
 }
 
 #[inline]
 pub fn pawn_up(bb: u64, stop: u64) -> u64 {
-    shift::up(bb, 1)
-        | (shift::up_left(bb, 1) & stop)
-        | (shift::up_right(bb, 1) & stop)
+    shift::up(bb, 1) | (shift::up_left(bb, 1) & stop) | (shift::up_right(bb, 1) & stop)
 }
-

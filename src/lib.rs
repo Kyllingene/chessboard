@@ -18,6 +18,9 @@ mod mask;
 mod piece;
 mod shift;
 mod slide;
+mod uci;
+
+pub use pfen::{Castling, Color, Piece, PieceKind};
 
 #[cfg(test)]
 mod test;

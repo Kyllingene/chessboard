@@ -1,4 +1,4 @@
-use crate::{helper, shift, mask};
+use crate::{helper, mask, shift};
 
 macro_rules! slide_fn {
     ( $outer:meta, $name:ident, $fn:expr ) => {
@@ -15,7 +15,7 @@ macro_rules! slide_fn {
 
             out & !bb
         }
-    }
+    };
 }
 
 macro_rules! slide_fns {
@@ -42,4 +42,3 @@ slide_fns!(
     /// Slide diagonally down-right
     , anti_diag_left, shift::down_right,
 );
-

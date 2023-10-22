@@ -49,4 +49,3 @@ pub fn unset_idx(bb: u64, i: u8) -> u64 {
 pub fn toggle_idx(bb: u64, i: u8) -> u64 {
     bb ^ idx(i)
 }
-
